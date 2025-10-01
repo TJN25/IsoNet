@@ -219,6 +219,7 @@ def check_gpu(args):
 
     #import tensorflow related modules after setting environment
     import tensorflow as tf
+    tf.config.optimizer.set_jit(False)
 
     gpu_info =  tf.config.list_physical_devices('GPU')
     logging.debug(gpu_info)   
