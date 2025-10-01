@@ -17,7 +17,8 @@ def train3D_continue(outFile,
                     lr=0.0004,
                     steps_per_epoch=128,
                     batch_size=64,
-                    n_gpus=2):
+                    n_gpus=2,
+                    cube_size=64):
     
     # logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',datefmt="%H:%M:%S",level=logging.DEBUG)
     # logging.debug('The tf message level {}'.format(os.environ['TF_CPP_MIN_LOG_LEVEL']))
@@ -54,9 +55,10 @@ def train3D_continue(outFile,
     # tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
     # callback_list.append(tensor_board)
     logging.info("begin fitting")
+    shape = (None, cube_size, cube_size, cube_size, 1)
     train_data, test_data= prepare_dataseq(data_dir, batch_size)
-    train_data = tf.data.Dataset.from_generator(train_data,output_types=(tf.float32,tf.float32))
-    test_data = tf.data.Dataset.from_generator(test_data,output_types=(tf.float32,tf.float32))
+    train_data = tf.data.Dataset.from_generator(train_data,output_types=(tf.float32,tf.float32), output_shapes=(shape, shape))
+    test_data = tf.data.Dataset.from_generator(test_data,output_types=(tf.float32,tf.float32), output_shapes=(shape, shape))
     if n_gpus > 1:
         options = tf.data.Options()
         options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
@@ -99,7 +101,8 @@ def train_data(settings):
                                         steps_per_epoch=settings.steps_per_epoch,
                                         batch_size=settings.batch_size,
                                         lr = settings.learning_rate,
-                                        n_gpus=settings.ngpus)
+                                        n_gpus=settings.ngpus,
+                                        cube_size=settings.cube_size)
 
     # if settings.iter_count == 0 and settings.pretrained_model is None :
     #     history = train3D_seq('{}/model_iter{:0>2d}.h5'.format(settings.result_dir,settings.iter_count+1),
