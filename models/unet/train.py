@@ -6,6 +6,7 @@ from IsoNet.models.unet.data_sequence import prepare_dataseq
 from IsoNet.models.unet.model import Unet
 import numpy as np
 from tensorflow.keras.models import load_model
+from tensorflow.keras.losses import mae
 
 
 def train3D_continue(outFile,
@@ -31,13 +32,13 @@ def train3D_continue(outFile,
     # test_data = strategy.experimental_distribute_dataset(test_data)
     if n_gpus > 1:
         with strategy.scope():
-            model = load_model( model_file)
+            model = load_model( model_file, custom_objects={'mae': mae})
             optimizer = Adam(learning_rate = lr)
-            model.compile(optimizer=optimizer, loss='mae', metrics=('mse','mae'))
+            model.compile(optimizer=optimizer, loss='mae', metrics=['mse','mae'])
     else:
-        model = load_model( model_file)
+        model = load_model( model_file, custom_objects={'mae': mae})
         optimizer = Adam(learning_rate = lr)
-        model.compile(optimizer=optimizer, loss='mae', metrics=('mse','mae'))
+        model.compile(optimizer=optimizer, loss='mae', metrics=['mse','mae'])
     # model.compile(optimizer=optimizer, loss='mae', metrics=_metrics)
     logging.info("Loaded model from disk")
 
