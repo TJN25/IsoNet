@@ -65,7 +65,7 @@ def train3D_continue(outFile,
         train_data = train_data.with_options(options)
         test_data = test_data.with_options(options)
     history = model.fit(train_data, validation_data=test_data,
-                                  epochs=epochs, steps_per_epoch=steps_per_epoch,validation_steps=np.ceil(0.1*steps_per_epoch),
+                                  epochs=epochs, steps_per_epoch=steps_per_epoch,validation_steps=int(np.ceil(0.1*steps_per_epoch)),
                                   verbose=1)
                                 #   callbacks=callback_list)
     # if n_gpus>1:
