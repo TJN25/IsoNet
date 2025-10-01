@@ -6,6 +6,7 @@ import mrcfile
 from IsoNet.preprocessing.img_processing import normalize
 import numpy as np
 import tensorflow.keras.backend as K
+from tensorflow.keras.losses import mae
 import os
 from IsoNet.util.toTile import reform3D
 from tqdm import tqdm
@@ -16,9 +17,9 @@ def predict(settings):
     strategy = tf.distribute.MirroredStrategy()
     if settings.ngpus >1:
         with strategy.scope():
-            model = load_model('{}/model_iter{:0>2d}.h5'.format(settings.result_dir,settings.iter_count-1))
+            model = load_model('{}/model_iter{:0>2d}.h5'.format(settings.result_dir,settings.iter_count-1), custom_objects={'mae': mae})
     else:
-        model = load_model('{}/model_iter{:0>2d}.h5'.format(settings.result_dir,settings.iter_count-1))
+        model = load_model('{}/model_iter{:0>2d}.h5'.format(settings.result_dir,settings.iter_count-1), custom_objects={'mae': mae})
     N = settings.predict_batch_size 
     num_batches = len(settings.mrc_list)
     if num_batches%N == 0:
@@ -65,9 +66,9 @@ def predict_one(args,one_tomo,output_file=None):
     if args.ngpus >1:
         strategy = tf.distribute.MirroredStrategy()
         with strategy.scope():
-            model = tf.keras.models.load_model(args.model)
+            model = tf.keras.models.load_model(args.model, custom_objects={'mae': mae})
     else:
-        model = tf.keras.models.load_model(args.model)
+        model = tf.keras.models.load_model(args.model, custom_objects={'mae': mae})
 
     logging.info("Loaded model from disk")
     root_name = one_tomo.split('/')[-1].split('.')[0]
