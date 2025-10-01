@@ -66,7 +66,8 @@ def train3D_continue(outFile,
         test_data = test_data.with_options(options)
     history = model.fit(train_data, validation_data=test_data,
                                   epochs=epochs, steps_per_epoch=steps_per_epoch,validation_steps=np.ceil(0.1*steps_per_epoch),
-                                  verbose=1)
+                                  verbose=1,
+                                  jit_compile=False)
                                 #   callbacks=callback_list)
     # if n_gpus>1:
     #     model_from_multimodel = model.get_layer('model_1')   
